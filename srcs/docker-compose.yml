@@ -1,0 +1,16 @@
+name: inception
+
+services:
+  mariadb:
+    build: ./requirements/mariadb
+    env_file: .env
+    networks: inception
+    volumes:
+      mariadb_data:/var/lib/mysql
+    restar: on-failure
+
+volumes:
+  mariadb_data:
+
+networks:
+  inception:

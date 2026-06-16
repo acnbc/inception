@@ -1,56 +1,75 @@
 NAME := inception
 
-LOGIN ?= $(USER)
-DATA_DIR ?= /home/$(LOGIN)/data
-WORDPRESS_DATA_DIR ?= $(DATA_DIR)/wordpress
-MARIADB_DATA_DIR ?= $(DATA_DIR)/mariadb
-
 COMPOSE_FILE ?= srcs/docker-compose.yml
 ENV_FILE ?= srcs/.env
 COMPOSE ?= docker compose
+COMPOSE_RUN := $(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME)
 
-.PHONY: all up down start stop restart build rebuild clean fclean re ps logs prepare check
+.PHONY: all up down start stop restart build rebuild clean fclean re ps logs check \
+	test test-mariadb test-wordpress test-nginx
 
 all: up
 
-up: prepare check
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) up -d --build
+up: check
+	$(COMPOSE_RUN) up -d --build
 
 down: check-compose
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) down
+	$(COMPOSE_RUN) down
 
 start: check-compose
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) start
+	$(COMPOSE_RUN) start
 
 stop: check-compose
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) stop
+	$(COMPOSE_RUN) stop
 
 restart: down up
 
-build: prepare check
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) build
+build: check
+	$(COMPOSE_RUN) build
 
-rebuild: prepare check
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) up -d --build --force-recreate
+rebuild: check
+	$(COMPOSE_RUN) up -d --build --force-recreate
 
 clean: check-compose
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) down --remove-orphans
+	$(COMPOSE_RUN) down --remove-orphans
 
 fclean: check-compose
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) down --volumes --remove-orphans --rmi all
-	rm -rf $(WORDPRESS_DATA_DIR) $(MARIADB_DATA_DIR)
+	$(COMPOSE_RUN) down --volumes --remove-orphans --rmi all
 	docker system prune -af
 
 re: fclean all
 
 ps: check-compose
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) ps
+	$(COMPOSE_RUN) ps
 
 logs: check-compose
-	$(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME) logs -f
+	$(COMPOSE_RUN) logs -f
 
-prepare:
-	mkdir -p $(WORDPRESS_DATA_DIR) $(MARIADB_DATA_DIR)
+test: check-compose
+	@$(MAKE) test-mariadb
+	@$(MAKE) test-wordpress
+	@$(MAKE) test-nginx
+
+test-mariadb: check-compose
+	@echo "==> Testing MariaDB connection..."
+	@$(COMPOSE_RUN) exec -T mariadb \
+		bash -c 'mariadb -h127.0.0.1 -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" -e "SHOW DATABASES;"'
+	@echo "MariaDB: OK"
+
+test-wordpress: check-compose
+	@echo "==> Testing WordPress (PHP-FPM + MariaDB)..."
+	@$(COMPOSE_RUN) exec -T wordpress \
+		bash -c 'pgrep -f php-fpm >/dev/null'
+	@$(COMPOSE_RUN) exec -T wordpress \
+		bash -c 'php -r '"'"'$$m=new mysqli(getenv("WORDPRESS_DB_HOST"),getenv("WORDPRESS_DB_USER"),getenv("WORDPRESS_DB_PASSWORD"),getenv("WORDPRESS_DB_NAME")); if ($$m->connect_error) { fwrite(STDERR, $$m->connect_error . PHP_EOL); exit(1); } echo "DB connection OK\n";'"'"''
+	@echo "WordPress: OK"
+
+test-nginx: check-compose
+	@echo "==> Testing NGINX..."
+	@$(COMPOSE_RUN) exec -T nginx nginx -t
+	@$(COMPOSE_RUN) exec -T nginx \
+		curl -fkfsS https://127.0.0.1/ -o /dev/null
+	@echo "NGINX: OK"
 
 check: check-compose check-env
 

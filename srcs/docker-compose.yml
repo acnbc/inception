@@ -10,8 +10,20 @@ services:
       - mariadb_data:/var/lib/mysql
     restart: on-failure
 
+  wordpress:
+    build: ./requirements/wordpress
+    env_file: .env
+    networks:
+      - inception
+    volumes:
+      -wordpress_data:/var/www/html
+    depends_on:
+      - mariadb
+    restart: on-failure
+
 volumes:
   mariadb_data:
+  wordpress_data:
 
 networks:
   inception:

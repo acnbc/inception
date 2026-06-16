@@ -7,6 +7,9 @@ INIT_MARKER="${DATADIR}/.inception-init-done"
 mkdir -p /var/log/mysql /run/mysqld
 chown -R mysql:mysql /var/log/mysql /run/mysqld
 
+MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+
 run_init_sql() {
 	mariadbd --user=mysql &
 	mariadbd_pid=$!

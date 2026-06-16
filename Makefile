@@ -2,6 +2,9 @@ NAME := inception
 
 COMPOSE_FILE ?= srcs/docker-compose.yml
 ENV_FILE ?= srcs/.env
+CREDENTIALS_FILE=secrets/credentials.txt
+DB_PASSWORD_FILE=secrets/db_password.txt
+DB_ROOT_PASSWORD_FILE=secrets/db_root_password.txt
 COMPOSE ?= docker compose
 COMPOSE_RUN := $(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME)
 
@@ -53,7 +56,7 @@ test: check-compose
 test-mariadb: check-compose
 	@echo "==> Testing MariaDB connection..."
 	@$(COMPOSE_RUN) exec -T mariadb \
-		bash -c 'mariadb -h127.0.0.1 -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" -e "SHOW DATABASES;"'
+		bash -c 'mariadb -h127.0.0.1 -u"$$MYSQL_USER" -p"$$(cat /run/secrets/db_password)" -e "SHOW DATABASES;"'
 	@echo "MariaDB: OK"
 
 test-wordpress: check-compose
@@ -71,10 +74,15 @@ test-nginx: check-compose
 		curl -fkfsS https://127.0.0.1/ -o /dev/null
 	@echo "NGINX: OK"
 
-check: check-compose check-env
+check: check-compose check-env check-secrets
 
 check-compose:
 	@test -f $(COMPOSE_FILE) || (echo "Missing $(COMPOSE_FILE). Create the mandatory Inception compose file first." && exit 1)
 
 check-env:
 	@test -f $(ENV_FILE) || (echo "Missing $(ENV_FILE). Create it from your mandatory environment variables/secrets." && exit 1)
+
+check-secrets:
+	@test -f $(CREDENTIALS_FILE) || (echo "Missing $(CREDENTIALS_FILE)." && exit 1)
+	@test -f $(DB_PASSWORD_FILE) || (echo "Missing $(DB_PASSWORD_FILE)." && exit 1)
+	@test -f $(DB_ROOT_PASSWORD_FILE) || (echo "Missing $(DB_ROOT_PASSWORD_FILE)." && exit 1)

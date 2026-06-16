@@ -4,6 +4,9 @@ services:
   mariadb:
     build: ./requirements/mariadb
     env_file: .env
+    secrets:
+      - db_root_password
+      - db_password
     networks:
       - inception
     volumes:
@@ -28,3 +31,9 @@ volumes:
 networks:
   inception:
     driver: bridge
+
+secrets:
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_password:
+    file: ../secrets/db_password.txt

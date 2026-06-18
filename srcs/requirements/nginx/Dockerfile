@@ -9,6 +9,8 @@ COPY conf/inception-nginx.conf /etc/nginx/nginx.conf
 
 COPY tools/nginx-init.sh /usr/local/bin/nginx-init.sh
 
+EXPOSE 443
+
 RUN chmod +x ngnix-init.sh
 
 ENTRYPOINT ["/usr/local/bin/nginx-init.sh"]

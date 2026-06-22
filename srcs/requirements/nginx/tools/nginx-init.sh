@@ -2,6 +2,7 @@
 set -e
 
 SSL_DIR="/etc/nginx/ssl"
+DOMAIN_NAME="anogueir.42.fr"
 
 mkdir -p "${SSL_DIR}"
 

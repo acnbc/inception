@@ -29,8 +29,6 @@ RUN wget -q https://wordpress.org/latest.tar.gz -O /tmp/wordpress.tar.gz \
 
 COPY ./conf/inception-wordpress.conf /etc/wordpress/wp-config.php
 
-COPY ./tools/wordpress-init.sh /usr/local/bin/wordpress-init.sh
-
-RUN chmod +x /usr/local/bin/wordpress-init.sh
+COPY --chmod=755 tools/wordpress-init.sh /usr/local/bin/wordpress-init.sh
 
 ENTRYPOINT ["/usr/local/bin/wordpress-init.sh"]

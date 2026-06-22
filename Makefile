@@ -64,14 +64,13 @@ test-wordpress: check-compose
 	@$(COMPOSE_RUN) exec -T wordpress \
 		bash -c 'pgrep -f php-fpm >/dev/null'
 	@$(COMPOSE_RUN) exec -T wordpress \
-		bash -c 'php -r '"'"'$$m=new mysqli(getenv("WORDPRESS_DB_HOST"),getenv("WORDPRESS_DB_USER"),getenv("WORDPRESS_DB_PASSWORD"),getenv("WORDPRESS_DB_NAME")); if ($$m->connect_error) { fwrite(STDERR, $$m->connect_error . PHP_EOL); exit(1); } echo "DB connection OK\n";'"'"''
+		bash -c 'php -r '"'"'$$m=new mysqli(getenv("WORDPRESS_DB_HOST"),getenv("MYSQL_USER"),trim(file_get_contents("/run/secrets/db_password")),getenv("MYSQL_DATABASE")); if ($$m->connect_error) { fwrite(STDERR, $$m->connect_error . PHP_EOL); exit(1); } echo "DB connection OK\n";'"'"''
 	@echo "WordPress: OK"
 
 test-nginx: check-compose
 	@echo "==> Testing NGINX..."
 	@$(COMPOSE_RUN) exec -T nginx nginx -t
-	@$(COMPOSE_RUN) exec -T nginx \
-		curl -fkfsS https://127.0.0.1/ -o /dev/null
+	@curl -fkfsS --resolve anogueir.42.fr:443:127.0.0.1 https://anogueir.42.fr/ -o /dev/null
 	@echo "NGINX: OK"
 
 check: check-compose check-env check-secrets

@@ -16,10 +16,13 @@ services:
   wordpress:
     build: ./requirements/wordpress
     env_file: .env
+    secrets:
+      - credentials
+      - db_password
     networks:
       - inception
     volumes:
-      -wordpress_data:/var/www/html
+      - wordpress_data:/var/www/html
     depends_on:
       - mariadb
     restart: on-failure
@@ -29,6 +32,8 @@ services:
     env_file: .env
     networks:
       - inception
+    volumes:
+      - wordpress_data:/var/www/html
     depends_on:
       - wordpress
     restart: on-failure
@@ -48,3 +53,5 @@ secrets:
     file: ../secrets/db_root_password.txt
   db_password:
     file: ../secrets/db_password.txt
+  credentials:
+    file: ../secrets/credentials.txt

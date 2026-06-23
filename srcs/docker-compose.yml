@@ -43,7 +43,18 @@ services:
 
 volumes:
   mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/anogueir/data/mariadb
+
   wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/anogueir/data/wordpress
 
 networks:
   inception:
@@ -52,9 +63,12 @@ networks:
 secrets:
   db_root_password:
     file: ../secrets/db_root_password.txt
+  
   db_password:
     file: ../secrets/db_password.txt
+  
   credentials:
     file: ../secrets/credentials.txt
+  
   wp_user2_password:
     file: ../secrets/wp_user2_password.txt

@@ -5,8 +5,7 @@ HTML="/var/www/html"
 WP_SRC="/usr/src/wordpress"
 WP_CONFIG_SRC="/etc/wordpress/wp-config.php"
 WORDPRESS_ADMIN_PASSWORD=$(cat /run/secrets/credentials)
-WORDPRESS_USER2_PASSWORD=$(cat /run/secrets/db_password)
-DOMAIN_NAME="anogueir.42.fr"
+WORDPRESS_USER2_PASSWORD=$(cat /run/secrets/wp_user2_password)
 
 # 1. WordPress no volume (primeiro arranque)
 if [ ! -f "${HTML}/index.php" ]; then

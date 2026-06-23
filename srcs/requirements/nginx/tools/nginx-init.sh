@@ -2,7 +2,6 @@
 set -e
 
 SSL_DIR="/etc/nginx/ssl"
-DOMAIN_NAME="anogueir.42.fr"
 
 mkdir -p "${SSL_DIR}"
 
@@ -13,5 +12,7 @@ if [ ! -f "${SSL_DIR}/server.crt" ]; then
     -out "${SSL_DIR}/server.crt" \
     -subj "/CN=${DOMAIN_NAME}"
 fi
+
+envsubst '${DOMAIN_NAME}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 exec nginx -g 'daemon off;'

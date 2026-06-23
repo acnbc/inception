@@ -19,6 +19,7 @@ services:
     secrets:
       - credentials
       - db_password
+      - wp_user2_password
     networks:
       - inception
     volumes:
@@ -55,3 +56,5 @@ secrets:
     file: ../secrets/db_password.txt
   credentials:
     file: ../secrets/credentials.txt
+  wp_user2_password:
+    file: ../secrets/wp_user2_password.txt

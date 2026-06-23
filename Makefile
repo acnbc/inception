@@ -5,8 +5,14 @@ ENV_FILE ?= srcs/.env
 CREDENTIALS_FILE=secrets/credentials.txt
 DB_PASSWORD_FILE=secrets/db_password.txt
 DB_ROOT_PASSWORD_FILE=secrets/db_root_password.txt
+WP_USER2_PASSWORD_FILE=secrets/wp_user2_password.txt
 COMPOSE ?= docker compose
 COMPOSE_RUN := $(COMPOSE) -f $(COMPOSE_FILE) --env-file $(ENV_FILE) -p $(NAME)
+
+ifneq (,$(wildcard $(ENV_FILE)))
+include $(ENV_FILE)
+export
+endif
 
 .PHONY: all up down start stop restart build rebuild clean fclean re ps logs check \
 	test test-mariadb test-wordpress test-nginx
@@ -70,7 +76,7 @@ test-wordpress: check-compose
 test-nginx: check-compose
 	@echo "==> Testing NGINX..."
 	@$(COMPOSE_RUN) exec -T nginx nginx -t
-	@curl -fkfsS --resolve anogueir.42.fr:443:127.0.0.1 https://anogueir.42.fr/ -o /dev/null
+	@curl -fkfsS --resolve $(DOMAIN_NAME):443:127.0.0.1 https://$(DOMAIN_NAME)/ -o /dev/null
 	@echo "NGINX: OK"
 
 check: check-compose check-env check-secrets
@@ -85,3 +91,4 @@ check-secrets:
 	@test -f $(CREDENTIALS_FILE) || (echo "Missing $(CREDENTIALS_FILE)." && exit 1)
 	@test -f $(DB_PASSWORD_FILE) || (echo "Missing $(DB_PASSWORD_FILE)." && exit 1)
 	@test -f $(DB_ROOT_PASSWORD_FILE) || (echo "Missing $(DB_ROOT_PASSWORD_FILE)." && exit 1)
+	@test -f $(WP_USER2_PASSWORD_FILE) || (echo "Missing $(WP_USER2_PASSWORD_FILE)." && exit 1)

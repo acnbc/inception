@@ -27,3 +27,7 @@ EOF
 sudo apt update
 
 echo "Repositório Docker configurado com sucesso."
+
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+echo "Docker instalado com sucesso."

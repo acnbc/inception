@@ -30,4 +30,8 @@ echo "Repositório Docker configurado com sucesso."
 
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+sudo usermod -aG docker $USER
+
+newgrp docker
+
 echo "Docker instalado com sucesso."

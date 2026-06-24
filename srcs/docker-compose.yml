@@ -2,6 +2,7 @@ name: inception
 
 services:
   mariadb:
+    image: inception-mariadb:1.0
     build: ./requirements/mariadb
     env_file: .env
     secrets:
@@ -14,6 +15,7 @@ services:
     restart: on-failure
 
   wordpress:
+    image: inception-wordpress:1.0
     build: ./requirements/wordpress
     env_file: .env
     secrets:
@@ -29,6 +31,7 @@ services:
     restart: on-failure
 
   nginx:
+    image: inception-nginx:1.0
     build: ./requirements/nginx
     env_file: .env
     networks:

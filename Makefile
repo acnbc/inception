@@ -79,7 +79,27 @@ test-nginx: check-compose
 	@curl -fkfsS --resolve $(DOMAIN_NAME):443:127.0.0.1 https://$(DOMAIN_NAME)/ -o /dev/null
 	@echo "NGINX: OK"
 
-check: check-compose check-env check-secrets
+check: check-compose check-env check-secrets check-no-latest
+
+check-no-latest: check-dockerfiles check-image-tags
+
+check-dockerfiles:
+	@echo "==> Checking for prohibited :latest in Docker/Compose files..."
+	@! grep -RInE '(FROM[[:space:]]+[^[:space:]]+:latest|image:[[:space:]]*[^[:space:]]+:latest)' \
+		srcs/requirements srcs/docker-compose.yml \
+		|| (echo "ERROR: :latest tag found in Dockerfile or compose." && exit 1)
+		echo "No :latest in Dockerfiles or compose — OK"
+
+check-image-tags:
+	@echo "==> Checking project images for :latest tag..."
+	@bad=$$(docker images --format '{{.Repository}}:{{.Tag}}' \
+		| grep -E '^inception-' | grep ':latest$$' || true); \
+	if [ -n "$$bad" ]; then \
+		echo "ERROR: project images tagged as latest:"; \
+		echo "$$bad"; \
+		exit 1; \
+	fi
+	echo "No project images tagged as :latest — OK"
 
 check-compose:
 	@test -f $(COMPOSE_FILE) || (echo "Missing $(COMPOSE_FILE). Create the mandatory Inception compose file first." && exit 1)

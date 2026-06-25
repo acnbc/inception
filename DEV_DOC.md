@@ -73,7 +73,6 @@ cp srcs/.env.example srcs/.env
 |------------------------|--------------------------------------------------------|
 | `DATADIR`              | Internal MariaDB path (`/var/lib/mysql`)               |
 | `MYSQL_DATABASE`       | Database name                                          |
-| `MYSQL_ADMIN`          | Database admin                                         |
 | `DOMAIN_NAME`          | Site domain (must match `/etc/hosts`)                  |
 | `WORDPRESS_TITLE`      | WordPress site title                                   |
 | `WORDPRESS_ADMIN_USER` | WordPress administrator login                          |
@@ -91,7 +90,7 @@ Create four text files in the `secrets/` folder at the repository root. Each fil
 |---------------------------------|--------------------------------------------------------|
 | `secrets/credentials.txt`       | WordPress administrator password                       |
 | `secrets/db_password.txt`       | MariaDB user password                                  |
-| `secrets/db_root_password.txt`  | MariaDB root password (`MYSQL_ADMIN`)                  |
+| `secrets/db_root_password.txt`  | MariaDB root password                                  |
 
 Example:
 

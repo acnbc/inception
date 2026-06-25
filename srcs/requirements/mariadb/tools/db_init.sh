@@ -10,6 +10,11 @@ chown -R mysql:mysql /var/log/mysql /run/mysqld
 MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 MYSQL_PASSWORD=$(cat /run/secrets/db_password)
 
+if [ -z "${MYSQL_USER2:-}" ]; then
+	echo "MYSQL_USER2 must be set to create the second MariaDB user."
+	exit 1
+fi
+
 run_init_sql() {
 	mariadbd --user=mysql &
 	mariadbd_pid=$!
@@ -23,8 +28,12 @@ run_init_sql() {
 		CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
 		CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 		CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';
+		CREATE USER IF NOT EXISTS '${MYSQL_USER2}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+		CREATE USER IF NOT EXISTS '${MYSQL_USER2}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';
 		GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 		GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'localhost';
+		GRANT SELECT ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER2}'@'%';
+		GRANT SELECT ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER2}'@'localhost';
 		FLUSH PRIVILEGES;
 	EOSQL
 

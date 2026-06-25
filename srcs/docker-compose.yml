@@ -21,7 +21,6 @@ services:
     secrets:
       - credentials
       - db_password
-      - wp_user2_password
     networks:
       - inception
     volumes:
@@ -42,8 +41,7 @@ services:
       - wordpress
     restart: on-failure
     ports:
-      - 443:443
-
+      - 8443:443
 volumes:
   mariadb_data:
     driver: local
@@ -73,5 +71,3 @@ secrets:
   credentials:
     file: ../secrets/credentials.txt
   
-  wp_user2_password:
-    file: ../secrets/wp_user2_password.txt

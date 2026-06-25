@@ -115,7 +115,7 @@ Docker was chosen because the Inception stack needs three cooperating services, 
 |---|---|---|
 | **Visibility** | Visible in `docker inspect`, process lists, and logs | Mounted as files in `/run/secrets/`, not exposed as env vars |
 | **Suitable for** | Non-sensitive config (domain, usernames, DB name) | Passwords and credentials |
-| **Use case here** | `DOMAIN_NAME`, `MYSQL_DATABASE`, `WORDPRESS_ADMIN_USER` in `.env` | `db_password`, `credentials`, `db_root_password`, `wp_user2_password` in `secrets/` |
+| **Use case here** | `DOMAIN_NAME`, `MYSQL_DATABASE`, `WORDPRESS_ADMIN_USER` in `.env` | `db_password`, `credentials`, `db_root_password` in `secrets/` |
 
 Passwords never appear in the `.env` file or in `docker inspect` output. The WordPress `wp-config.php` reads the database password directly from `/run/secrets/db_password` at runtime.
 

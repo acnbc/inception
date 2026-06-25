@@ -73,13 +73,12 @@ cp srcs/.env.example srcs/.env
 |------------------------|--------------------------------------------------------|
 | `DATADIR`              | Internal MariaDB path (`/var/lib/mysql`)               |
 | `MYSQL_DATABASE`       | Database name                                          |
-| `MYSQL_USER`           | Database user                                          |
+| `MYSQL_ADMIN`          | Database admin                                         |
 | `DOMAIN_NAME`          | Site domain (must match `/etc/hosts`)                  |
 | `WORDPRESS_TITLE`      | WordPress site title                                   |
 | `WORDPRESS_ADMIN_USER` | WordPress administrator login                          |
 | `WORDPRESS_ADMIN_EMAIL`| Administrator email                                    |
-| `WORDPRESS_USER2_LOGIN`| Second user login (project requirement)                |
-| `WORDPRESS_USER2_EMAIL`| Second user email                                      |
+| `MYSQL_USER`           | Second db user (project requirement)                   |
 | `WORDPRESS_DB_HOST`    | Database host (`mariadb` — service name)               |
 | `WORDPRESS_DB_NAME`    | Database name (same as `MYSQL_DATABASE`)               |
 
@@ -92,9 +91,8 @@ Create four text files in the `secrets/` folder at the repository root. Each fil
 | File                            | Purpose                                                |
 |---------------------------------|--------------------------------------------------------|
 | `secrets/credentials.txt`       | WordPress administrator password                       |
-| `secrets/db_password.txt`       | MariaDB user password (`MYSQL_USER`)                   |
-| `secrets/db_root_password.txt`  | MariaDB root password                                  |
-| `secrets/wp_user2_password.txt` | Second WordPress user password                         |
+| `secrets/db_password.txt`       | MariaDB user password                                  |
+| `secrets/db_root_password.txt`  | MariaDB root password (`MYSQL_ADMIN`)                  |
 
 Example:
 
@@ -103,7 +101,6 @@ mkdir -p secrets
 echo "my_admin_password"    > secrets/credentials.txt
 echo "my_db_password"       > secrets/db_password.txt
 echo "my_root_password"     > secrets/db_root_password.txt
-echo "my_user2_password"    > secrets/wp_user2_password.txt
 chmod 600 secrets/*.txt
 ```
 
@@ -261,8 +258,7 @@ inception/
 ├── secrets/                          # Passwords (not versioned)
 │   ├── credentials.txt
 │   ├── db_password.txt
-│   ├── db_root_password.txt
-│   └── wp_user2_password.txt
+│   └── db_root_password.txt
 └── srcs/
     ├── .env                          # Environment variables (not versioned)
     ├── .env.example                  # Configuration template

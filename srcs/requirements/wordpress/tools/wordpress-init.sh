@@ -5,7 +5,6 @@ HTML="/var/www/html"
 WP_SRC="/usr/src/wordpress"
 WP_CONFIG_SRC="/etc/wordpress/wp-config.php"
 WORDPRESS_ADMIN_PASSWORD=$(cat /run/secrets/credentials)
-WORDPRESS_USER2_PASSWORD=$(cat /run/secrets/wp_user2_password)
 
 # 1. WordPress no volume (primeiro arranque)
 if [ ! -f "${HTML}/index.php" ]; then
@@ -53,19 +52,7 @@ if ! wp core is-installed --path="${HTML}" --allow-root 2>/dev/null; then
 		--allow-root
 fi
 
-# 6. Segundo utilizador (requisito Inception)
-if ! wp user get "${WORDPRESS_USER2_LOGIN}" --path="${HTML}" --allow-root 2>/dev/null; then
-	echo "Creating second user..."
-	wp user create \
-		"${WORDPRESS_USER2_LOGIN}" \
-		"${WORDPRESS_USER2_EMAIL}" \
-		--role=author \
-		--user_pass="${WORDPRESS_USER2_PASSWORD}" \
-		--path="${HTML}" \
-		--allow-root
-fi
-
 chown -R www-data:www-data "${HTML}"
 
-# 7. PHP-FPM em foreground (liga ao listen 0.0.0.0:9000 do teu pool)
+# 6. PHP-FPM em foreground (liga ao listen 0.0.0.0:9000 do teu pool)
 exec php-fpm8.2 -F

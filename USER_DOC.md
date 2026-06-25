@@ -112,15 +112,14 @@ Password files contain a single line with the password only.
 | Password   | `secrets/credentials.txt`                     |
 | Email      | `WORDPRESS_ADMIN_EMAIL` in `srcs/.env`      |
 
-### Second WordPress user
+### Second Database user
 
-The project creates a second user with the **author** role:
+The project creates a second database user:
 
 | Field      | Source                                      |
 |------------|---------------------------------------------|
-| Username   | `WORDPRESS_USER2_LOGIN` in `srcs/.env`      |
-| Password   | `secrets/wp_user2_password.txt`             |
-| Email      | `WORDPRESS_USER2_EMAIL` in `srcs/.env`      |
+| Username   | `MYSQL_USER` in `srcs/.env`                 |
+| Password   | `secrets/db_password.txt`                   |
 
 ### Changing passwords
 

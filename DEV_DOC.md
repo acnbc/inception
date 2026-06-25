@@ -80,7 +80,6 @@ cp srcs/.env.example srcs/.env
 | `WORDPRESS_ADMIN_EMAIL`| Administrator email                                    |
 | `MYSQL_USER`           | Second db user (project requirement)                   |
 | `WORDPRESS_DB_HOST`    | Database host (`mariadb` — service name)               |
-| `WORDPRESS_DB_NAME`    | Database name (same as `MYSQL_DATABASE`)               |
 
 > The `srcs/.env` file is listed in `.gitignore` and **must not be committed**.
 

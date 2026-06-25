@@ -5,6 +5,10 @@ HTML="/var/www/html"
 WP_SRC="/usr/src/wordpress"
 WP_CONFIG_SRC="/etc/wordpress/wp-config.php"
 WORDPRESS_ADMIN_PASSWORD=$(cat /run/secrets/credentials)
+WP_DB_PASSWORD_FILE="/run/wp-secrets/db_password"
+
+mkdir -p /run/wp-secrets
+install -m 0440 -o root -g www-data /run/secrets/db_password /run/wp-secrets/db_password
 
 # 1. WordPress no volume (primeiro arranque)
 if [ ! -f "${HTML}/index.php" ]; then

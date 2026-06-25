@@ -41,7 +41,7 @@ services:
       - wordpress
     restart: on-failure
     ports:
-      - 8443:443
+      - 443:443
 volumes:
   mariadb_data:
     driver: local

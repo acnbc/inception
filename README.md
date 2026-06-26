@@ -98,7 +98,15 @@ Sensitive values (passwords) are stored in `secrets/` and injected at runtime vi
 - **Shared volume between WordPress and NGINX** — both containers mount the same `wordpress_data` volume so NGINX can serve static files while PHP-FPM handles dynamic requests.
 - **Internal bridge network** — services communicate by name (`mariadb`, `wordpress`) without exposing the database or PHP-FPM ports to the host.
 
+### Docker
+
+**Docker** is a tool that functions as an **interface** through which we **manage containers**. When we talk about **containers**, we are talking about **isolation**: isolation of physical resources (CPU, memory, I/O, etc.) and logical resources (file system, processes, network, etc.). This isolation is possible due to the **abstraction** of the operating system, avoiding process conflicts, network issues, and so on. The container contains only the **resources** needed for an application to run.
+
+Docker is based on **images**. A **declarative file** is created in which, according to the program's syntax, the necessary resources are listed, and from which an image is built. The image is therefore a **packaging** of all the resources needed in the environment for a given application, defining how a container will be executed. Thus, the container is an **ephemeral instance** of the image.
+
 ### Virtual Machines vs Docker
+
+The level of **abstraction** in **Virtual Machines** differs from that in **Docker**: the latter is an abstraction of the **Operating System**; the former are an abstraction of the computer's **hardware**.
 
 | | Virtual Machines | Docker |
 |---|---|---|
@@ -107,17 +115,25 @@ Sensitive values (passwords) are stored in `secrets/` and injected at runtime vi
 | **Portability** | Requires a hypervisor and OS images | Images are portable and reproducible across hosts |
 | **Use case here** | Would mean running 3 separate OS instances for 3 services | One host runs 3 lean containers, each with only what it needs |
 
-Docker was chosen because the Inception stack needs three cooperating services, not three full operating systems. Containers provide sufficient isolation with far less overhead.
+It makes sense that Docker was chosen to be a part of the project, because the Inception stack needs three cooperating services, not three full operating systems. Containers provide sufficient isolation with far less overhead.
 
 ### Secrets vs Environment Variables
 
-| | Environment Variables | Docker Secrets |
-|---|---|---|
-| **Visibility** | Visible in `docker inspect`, process lists, and logs | Mounted as files in `/run/secrets/`, not exposed as env vars |
-| **Suitable for** | Non-sensitive config (domain, usernames, DB name) | Passwords and credentials |
-| **Use case here** | `DOMAIN_NAME`, `MYSQL_DATABASE`, `WORDPRESS_ADMIN_USER` in `.env` | `db_password`, `credentials`, `db_root_password` in `secrets/` |
+**Secrets** are values that must stay private, such as DB passwords, root passwords, API keys, WordPress salts, admin passwords in this project. They are intended for **production** with Docker Swarm. Secrets are stored encrypted and mounted as **files** under `/run/secrets/` (e.g. `/run/secrets/db_password`). Only services that declare the secret can read it—not every container on the host.
+In **secrets-style pattern without Swarm** (read from a file instead of env) docker compose lets you use secrets **without** storing them in environment variables — and the examples use normal Compose, not Swarm. Each secret becomes a read-only file.
 
-Passwords never appear in the `.env` file or in `docker inspect` output. The WordPress `wp-config.php` reads the database password directly from `/run/secrets/db_password` at runtime.
+An `.env` file is a **local configuration file** with `KEY=value` pairs. Docker Compose can load it automatically or via `env_file`.
+The **drawbacks** in using them is that they are visible via `docker inspect`, sometimes in process listings (`ps aux`), logs if you echo them, and in compose files if interpolated carelessly.
+
+They play different roles:
+
+| | `.env` | `secrets/` |
+|---|--------|--------------|
+| **Purpose** | Non-sensitive config | Passwords and credentials |
+| **Examples** | domain, DB name, usernames, paths | root password, DB password, WP admin password |
+| **In Git** | `.env.example` yes, `.env` no | never |
+| **In container** | environment variables | files under `/run/secrets/` |
+| **Visibility** | visible in `docker inspect` | not exposed as env vars |
 
 ### Docker Network vs Host Network
 
@@ -141,9 +157,16 @@ The `inception` bridge network keeps inter-service traffic isolated while allowi
 
 Bind mounts are configured with `driver: local`, `type: none`, and `o: bind` so data persists in predictable host directories outside Docker's internal storage.
 
+On the project, though we implement a combination of Docker Named Volumes and Bind Mounts, seeing that we declare its specifications on docker-compose, creating a named volume, but also specifying a directory the volume must be binded to, therefore creating binded mounts whilest having Docker volume managing. 
+
 ---
 
 ## Resources
+
+### Videos / Tutorials
+
+- [My YouTube Inception playlist](https://youtube.com/playlist?list=PLft9u7_h34bE&si=qvSqKP2TVMwsT19l)
+- [Descomplicando o Docker YouTube course](https://youtube.com/playlist?list=PLf-O3X2-mxDn1VpyU2q3fuI6YYeIWp5rR&si=jJAwtBPjjXaA4eOg)
 
 ### Documentation
 

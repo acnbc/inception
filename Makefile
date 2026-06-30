@@ -47,6 +47,12 @@ fclean: check-compose
 
 re: fclean all
 
+volume-prune:
+	docker run --rm --user root \
+  	-v /home/anogueir/data:/data \
+  	debian:bookworm-slim \
+  	sh -c 'rm -rf /data/mariadb/ /data/wordpress/'
+
 ps: check-compose
 	$(COMPOSE_RUN) ps
 
